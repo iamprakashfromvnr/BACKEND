@@ -16,5 +16,20 @@ router.get('/states', (req, res) => {
       }
     });
   });
+router.get('/districts', (req, res) => {
+    const stateId = req.query.stateId;
+    if (!stateId) {
+        return res.status(400).json({ error: 'State ID is required' });
+    }
 
-  module.exports = router;
+    const query = 'SELECT * FROM districts WHERE state_id = ?';
+    db.query(query, [stateId], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        res.json(results);
+    });
+});
+
+module.exports = router;

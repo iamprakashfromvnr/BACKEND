@@ -2,31 +2,26 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const cors = require('cors');
-// GET all category
-const app =express();
-app.use(cors());
-app.use(express.json());
-router.get('/category', (req, res) => {
-  db.query('SELECT * FROM category WHERE is_active = 1', (err, results) => {
-    if (err) {
-      res.status(500).send("Database query error");
-    } else {
-      res.json(results);
-    }
-  });
-});
+
 
 // ADD a new category
 router.post('/category', (req, res) => {
-  const {category} = req.body;
-  const query = 'INSERT INTO category (category_name) VALUES (?)';
+  console.log('Data is Entered')
+  const { category } = req.body;
+  console.log(category);
+
+  if (!category) {
+      return res.status(400).json({ error: "Category field is required." });
+  }
+
+  const query = "INSERT INTO category (category_name) VALUES (?)";
   db.query(query, [category], (err, result) => {
-    if (err) {
-      res.status(500).send("Database insertion error",err);
-    } else {
-      res.json({ message: "Category added", id: result.insertId });
-    }
+      if (err) {
+          console.error("Database insertion error:", err);
+          return res.status(500).json({ error: "Database insertion error", details: err.message });
+      }
+
+      res.status(201).json({ message: "Category created successfully!", categoryId: result.insertId });
   });
 });
 
@@ -49,6 +44,17 @@ router.delete('/category/:id', (req, res) => {
 
     // Return a success message with the result of the deletion
     res.status(200).json({ message: 'Item deleted successfully', deletedItemId: id });
+  });
+});
+
+
+router.get('/category', (req, res) => {
+  db.query('SELECT * FROM category WHERE is_active = 1', (err, results) => {
+    if (err) {
+      res.status(500).send("Database query error");
+    } else {
+      res.json(results);
+    }
   });
 });
 

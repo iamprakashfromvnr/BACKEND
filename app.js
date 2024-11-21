@@ -5,7 +5,7 @@ const subcategoryroutes =require('./routes/subcategory');
 const natureofcompliance =require('./routes/natureofcompliance');
 const states =require('./routes/states');
 const compliancerouter =require('./routes/compliance');
-
+const companyrouter = require('./routes/company');
 const cors = require('cors');
 const db = require('./config/db');
 dotenv.config();
@@ -18,6 +18,7 @@ app.use('/api',subcategoryroutes);
 app.use('/api',natureofcompliance);
 app.use('/api',states);
 app.use('/api',compliancerouter);
+app.use('/api',companyrouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Ensure the uploads directory exists
-const uploadDir = path.resolve(__dirname, "../uploads");
+const uploadDir = path.resolve(__dirname, "../companylogos");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -31,49 +31,32 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Endpoint to handle form submission and file upload
-router.post("/compliance", upload.single("documentPdf"), (req, res) => {
+router.post("/company", upload.single("image"), (req, res) => {
   console.log("Received file:", req.file);
   console.log("Headers:", req.headers);
   console.log("Received body:", req.body);
 
   const {
-    natureOfCompliance,
-    activity,
-    typeOfAct,
-    applicationLaborAct,
-    dueDate,
-    section,
-    remarks,
-    nameOfForm,
-    state,
-    applicability,
-    frequencyOfCompliance,
-    priorityType,
+    companyName,branch, addressLine1,addressLine2,contactPerson,
+    stakeholderName,username,pincode,contactNumber,stakeholderDetail,
+    category,state,priority,assignedStaff,subcategory,district,
+    establishmentType, notificationAlert, password
   } = req.body;
 
-  const documentPdf = req.file ? req.file.filename : null;
+  const logoimage = req.file ? req.file.filename : null;
 
-  const sql = `INSERT INTO compliance_master 
-    (natureOfCompliance, activity, typeOfAct, applicationLaborAct, dueDate, section, remarks, nameOfForm, state, applicability, frequencyOfCompliance, priorityType, documentPdf) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO company_master 
+    (companyname,category,subcategory,state,district,branch,
+    address1,address2,pincode,contactperson,contactnumber,
+    priority,establishment,staff,notification,stakeholdername,stackholderemail,username,password,logo) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)`;
 
   db.query(
     sql,
     [
-      natureOfCompliance,
-      activity,
-      typeOfAct,
-      applicationLaborAct,
-      dueDate,
-      section,
-      remarks,
-      nameOfForm,
-      state,
-      applicability,
-      frequencyOfCompliance,
-      priorityType,
-      documentPdf,
-    ],
+    companyName,category,subcategory,state,district,branch,addressLine1,addressLine2,pincode,
+    contactPerson,contactNumber,priority,establishmentType,assignedStaff,notificationAlert,
+    stakeholderName,stakeholderDetail,username,password,logoimage],
     (err, result) => {
       if (err) {
         console.error("Database Error:", err);
@@ -84,8 +67,8 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
   );
 });
 
-router.get('/compliance', (req, res) => {
-  db.query('SELECT * FROM compliance_master WHERE is_active = 1', (err, results) => {
+router.get('/company', (req, res) => {
+  db.query('SELECT * FROM company_master WHERE is_active = 1', (err, results) => {
     if (err) {
       res.status(500).send("Database query error");
     } else {
@@ -94,7 +77,9 @@ router.get('/compliance', (req, res) => {
   });
 });
 
+
+
 // Serve uploaded files statically
-app.use("/uploads", express.static(uploadDir));
+app.use("/companylogos", express.static(uploadDir));
 
 module.exports = router;

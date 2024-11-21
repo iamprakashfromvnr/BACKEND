@@ -19,11 +19,11 @@ router.get('/natureofcompliance', (req, res) => {
 
 // ADD a new natureofcompliance
 router.post('/natureofcompliance', (req, res) => {
-  const {nature} = req.body;
+  const { nature } = req.body;
   const query = 'INSERT INTO natureofcompliance (nature) VALUES (?)';
   db.query(query, [nature], (err, result) => {
     if (err) {
-      res.status(500).send("Database insertion error",err);
+      res.status(500).json({ message: "Database insertion error", error: err });
     } else {
       res.json({ message: "Natureofcompliance added", id: result.insertId });
     }
