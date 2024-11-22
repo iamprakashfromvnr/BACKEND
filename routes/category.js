@@ -58,4 +58,46 @@ router.get('/category', (req, res) => {
   });
 });
 
+router.get('/categorylist', (req, res) => {
+  const id = req.query.id;
+  if (!id) {
+      return res.status(400).json({ error: 'Category ID is required' });
+  }
+
+  const query = 'SELECT * FROM category WHERE id = ?';
+  db.query(query, [id], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+      res.json(results);
+  });
+});
+
+
+router.put('/category/:id', async (req, res) => {
+  const { id } = req.params;
+  const { category } = req.body; // Get the category name from the request body
+
+  try {
+    // Update category by ID in the MySQL database
+    const query = 'UPDATE category SET category_name = ? WHERE id = ?';
+    db.query(query, [category, id], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+
+      res.json({ message: 'Category updated successfully' }); // Send success message
+    });
+  } catch (error) {
+    console.error('Error updating category:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
