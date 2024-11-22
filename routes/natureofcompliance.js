@@ -52,4 +52,45 @@ router.delete('/natureofcompliance/:id', (req, res) => {
   });
 });
 
+router.get('/natureofcompliancelist', (req, res) => {
+  const id = req.query.id;
+  if (!id) {
+      return res.status(400).json({ error: 'Category ID is required' });
+  }
+
+  const query = 'SELECT * FROM natureofcompliance WHERE id = ?';
+  db.query(query, [id], (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Database query failed' });
+      }
+      res.json(results);
+  });
+});
+
+router.put('/natureofcompliance/:id', async (req, res) => {
+  const { id } = req.params;
+  const { compliance } = req.body; // Get the category name from the request body
+
+  try {
+    // Update category by ID in the MySQL database
+    const query = 'UPDATE natureofcompliance SET nature = ? WHERE id = ?';
+    db.query(query, [compliance, id], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ message: 'Nature of Compliance not found' });
+      }
+
+      res.json({ message: 'Nature of Compliance updated successfully' }); // Send success message
+    });
+  } catch (error) {
+    console.error('Error updating Nature of Compliance:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 module.exports = router;
