@@ -6,6 +6,8 @@ const natureofcompliance =require('./routes/natureofcompliance');
 const states =require('./routes/states');
 const compliancerouter =require('./routes/compliance');
 const companyrouter = require('./routes/company');
+const branchrouter = require('./routes/branch');
+const userrouter = require('./routes/user');
 const cors = require('cors');
 const db = require('./config/db');
 dotenv.config();
@@ -19,6 +21,8 @@ app.use('/api',natureofcompliance);
 app.use('/api',states);
 app.use('/api',compliancerouter);
 app.use('/api',companyrouter);
+app.use('/api',branchrouter);
+app.use('/api',userrouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
