@@ -69,6 +69,7 @@ router.get('/natureofcompliancelist', (req, res) => {
 });
 
 router.put('/natureofcompliance/:id', async (req, res) => {
+  console.log("Data is Enter");
   const { id } = req.params;
   const { compliance } = req.body; // Get the category name from the request body
 

@@ -29,6 +29,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+app.use("/uploads", express.static(uploadDir));
 
 // Endpoint to handle form submission and file upload
 router.post("/compliance", upload.single("documentPdf"), (req, res) => {
