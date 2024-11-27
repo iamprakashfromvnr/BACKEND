@@ -51,28 +51,55 @@ router.get('/role', (req, res) => {
     });
   });
 
-  router.post('/user',upload.single("userImage"),(req,res)=>{
-    console.log("Received file:", req.file);
-    console.log("Headers:", req.headers);
-    console.log("Received body:", req.body);
-    const {
-        username, email, companyAccess, role, password, modulesAccess,
-    } =req.body;
-    
+  router.post('/user', upload.single('userImage'), (req, res) => {
+    const { username, email, password, role, companyAccess, modulesAccess } = req.body;
     const userImage = req.file ? req.file.filename : null;
-    const sql = "INSERT INTO users (username,password,email,role,company,module,profilephoto) VALUES (?,?,?,?,?,?,?)"
-    db.query(sql,[username,password,email,role,companyAccess,modulesAccess,userImage],(err, result) => {
+  
+    // Step 1: Insert user into the `users` table
+    const sql = `
+      INSERT INTO users (username, password, email, role, profilephoto) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
+    db.query(sql, [username, password, email, role, userImage], (err, result) => {
+      if (err) {
+        console.error('Database Error:', err);
+        return res.status(500).json({ message: 'Failed to save user record.' });
+      }
+  
+      const userId = result.insertId; // Get the ID of the newly created user
+  
+      // Step 2: Assign companies to user
+      if (companyAccess && companyAccess.length > 0) {
+        const companySql = `INSERT INTO user_company (user_id, company_id) VALUES (?,?)`;
+  
+        db.query(companySql, [userId,companyAccess], (err) => {
           if (err) {
-            console.error("Database Error:", err);
-            return res.status(500).json({ message: "Failed to save compliance record." });
+            console.error('Company Assignment Error:', err);
+            return res.status(500).json({ message: 'Failed to assign companies.' });
           }
-          res.status(200).json({ message: "Compliance record saved successfully." });
-        }
-    );
+        });
+      }
+  
+      
+  
+      // Step 4: Assign modules to user
+      if (modulesAccess && modulesAccess.length > 0) {
+        const moduleSql = `INSERT INTO user_module_access (user_id, module_id) VALUES(?,?)`;
+  
+        db.query(moduleSql, [userId,modulesAccess], (err) => {
+          if (err) {
+            console.error('Module Assignment Error:', err);
+            return res.status(500).json({ message: 'Failed to assign modules.' });
+          }
+        });
+      }
+  
+      res.status(200).json({ message: 'User created successfully.' });
+    });
   });
 
   router.get('/user', (req, res) => {
-    db.query('SELECT users.*,role.role as role,company_master.companyname as company,modules.modulename as module from users LEFT JOIN role ON users.role = role.id LEFT JOIN modules ON users.module = modules.id LEFT JOIN company_master ON users.company = company_master.id', (err, results) => {
+    db.query('SELECT users.*, role.role as role, company_master.companyname as companyname, user_company.company_id, user_module_access.module_id, modules.modulename as module FROM users LEFT JOIN role ON role.id = users.role LEFT JOIN user_company ON user_company.user_id = users.id LEFT JOIN company_master ON company_master.id = user_company.company_id LEFT JOIN user_module_access ON user_module_access.user_id = users.id LEFT JOIN modules ON modules.id = user_module_access.module_id;', (err, results) => {
       if (err) {
         res.status(500).send("Database query error");
       } else {
