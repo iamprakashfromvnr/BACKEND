@@ -8,7 +8,7 @@ const app =express();
 app.use(cors());
 app.use(express.json());
 router.get('/subcategory', (req, res) => {
-  db.query('SELECT subcategory.subcategory_name,category.category_name FROM subcategory JOIN category ON subcategory.category_id = category.id WHERE subcategory.is_active = 1', (err, results) => {
+  db.query('SELECT subcategory.* ,category.category_name FROM subcategory JOIN category ON subcategory.category_id = category.id WHERE subcategory.is_active = 1', (err, results) => {
     if (err) {
       res.status(500).send("Database query error");
     } else {
