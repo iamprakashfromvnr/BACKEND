@@ -82,7 +82,7 @@ router.get('/role', (req, res) => {
   
       
   
-      // Step 4: Assign modules to user
+      // Step 3: Assign modules to user
       if (modulesAccess && modulesAccess.length > 0) {
         const moduleSql = `INSERT INTO user_module_access (user_id, module_id) VALUES(?,?)`;
   
@@ -107,4 +107,28 @@ router.get('/role', (req, res) => {
       }
     });
   });
+
+
+  router.delete('/user/:id', (req, res) => {
+    const { id } = req.params;
+    console.log(id)
+  
+    // SQL query to delete the item based on its ID
+    const query = 'DELETE FROM users WHERE id = ?';
+  
+    db.query(query, [id], (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error deleting item', error: err });
+      }
+  
+      if (result.affectedRows === 0) {
+        // If no rows were affected, that means no item was found with the given ID
+        return res.status(404).json({ message: 'Item not found' });
+      }
+  
+      // Return a success message with the result of the deletion
+      res.status(200).json({ message: 'Item deleted successfully', deletedItemId: id });
+    });
+  });
+  
 module.exports = router;
