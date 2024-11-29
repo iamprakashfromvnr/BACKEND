@@ -119,6 +119,17 @@ router.delete('/compliance/:id', (req, res) => {
 });
 
 
+router.get('/compliancefilling', (req, res) => {
+  db.query('SELECT cm.*, cpm.*, s.statename, u.username AS staff_name, u.email AS staff_email FROM company_master cm CROSS JOIN compliance_master cpm LEFT JOIN states s ON cpm.state = s.id LEFT JOIN user_company uc ON cm.id = uc.company_id LEFT JOIN users u ON uc.user_id = u.id ORDER BY cm.id, cpm.id;', (err, results) => {
+    if (err) {
+      res.status(500).send("Database query error");
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+
 
 
 
