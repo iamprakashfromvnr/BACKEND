@@ -43,8 +43,9 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
     typeOfAct,
     applicationLaborAct,
     dueDate,
+    calendartype,
     section,
-    remarks,
+    score,
     nameOfForm,
     state,
     applicability,
@@ -55,7 +56,7 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
   const documentPdf = req.file ? req.file.filename : null;
 
   const sql = `INSERT INTO compliance_master 
-    (natureOfCompliance, activity, typeOfAct, applicationLaborAct, dueDate, section, remarks, nameOfForm, state, applicability, frequencyOfCompliance, priorityType, documentPdf) 
+    (natureOfCompliance, activity, typeOfAct, applicationLaborAct, dueDate,calendartype,section, score, nameOfForm, state, applicability, frequencyOfCompliance, priorityType, documentPdf) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   db.query(
@@ -66,8 +67,9 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
       typeOfAct,
       applicationLaborAct,
       dueDate,
+      calendartype,
       section,
-      remarks,
+      score,
       nameOfForm,
       state,
       applicability,
@@ -86,7 +88,7 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
 });
 
 router.get('/compliance', (req, res) => {
-  db.query('SELECT compliance_master.*, natureofcompliance.nature as natureOfCompliance FROM compliance_master LEFT JOIN natureofcompliance ON natureofcompliance.id = compliance_master.natureOfCompliance WHERE compliance_master.is_active = 1;', (err, results) => {
+  db.query('SELECT compliance_master.*, natureofcompliance.nature as nature FROM compliance_master LEFT JOIN natureofcompliance ON natureofcompliance.id = compliance_master.natureOfCompliance WHERE compliance_master.is_active = 1;', (err, results) => {
     if (err) {
       res.status(500).send("Database query error");
     } else {
