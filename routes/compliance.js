@@ -57,7 +57,7 @@ router.post("/compliance", upload.single("documentPdf"), (req, res) => {
 
   const sql = `INSERT INTO compliance_master 
     (natureOfCompliance, activity, typeOfAct, applicationLaborAct, dueDate,calendartype,section, score, nameOfForm, state, applicability, frequencyOfCompliance, priorityType, documentPdf) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
 
   db.query(
     sql,
